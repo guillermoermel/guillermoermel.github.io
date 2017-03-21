@@ -5,6 +5,9 @@ collections:
   blah:
     title: Blah
     output: true
+  bleh:
+    title: Bleh
+    output: true
   people:
     title: People
     output: true
