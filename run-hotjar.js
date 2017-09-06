@@ -1,10 +1,12 @@
 runHotjar();
 
 function runHotjar(myHotjarScriptId) {
-	if (getHotjarScriptId(myHotjarScriptId)) {
+	var hotjarScriptId = getHotjarScriptId(myHotjarScriptId);
+
+	if (hotjarScriptId) {
 		(function(h,o,t,j,a,r){
 		    h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-		    h._hjSettings={hjid:getHotjarScriptId(myHotjarScriptId),hjsv:5,hjdebug:false};
+		    h._hjSettings={hjid:hotjarScriptId,hjsv:5,hjdebug:false};
 		    a=o.getElementsByTagName('head')[0];
 		    r=o.createElement('script');r.async=1;
 		    r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
@@ -13,29 +15,47 @@ function runHotjar(myHotjarScriptId) {
 	}
 }
 
-
 function getHotjarScriptId(myHotjarScriptId) {
 	/*this function returns the id of a pre-defined hotjar script by country for the lower 50% (d2id < 8) the website traffic, or an optional hotjar script id defined by the developer for the higher 50% (d2id > 8). If no id is defined for the higher 50%, only the lower 50% gets a hotjar script id.
 
-	This strategy is intented to capture *both* the whole website navigation experience (e.g. whole use of Mercado Libre México as opposed to just the use of the product page) and also allow for teams to use their own hotjar script (e.g. to have their own incoming feedback, heatmaps or even some specific recordings).
+	This strategy is intended to capture *both* the whole website navigation experience (e.g. whole use of Mercado Libre México as opposed to just the use of the product page) and also allow for teams to use their own hotjar script (e.g. to have their own incoming feedback, heatmaps or even some specific recordings).
 	*/
-
-	//if d2id last character is a number, assign that user to the pool that will get the 'whole site' hotjar script for that country:
-	var d2id = window.d2id || readCookie('_d2id');
-	regex = /[0-7]$/i;
-	var hotjarForWholeSiteRecordings = d2id.search(regex) > 1;
-
-	if (hotjarForWholeSiteRecordings) {
-		var country = document.documentElement.dataset.country || document.body.dataset.country; // country id works in ML but not in MP.
-		switch (country) {
-		    case 'AR': return 589860 
-		    case 'BR': return 589861
-		    case 'MX': return 589863
-		    default  : return 601450
+		//if d2id last character is a number, assign that user to the pool that will get the 'whole site' hotjar script for that country:
+		if (myHotjarScriptId) { 
+			// solo dividir el tráfico si viene un parámetro de id en runHotjar(myHotjarScriptId)
+			// si viene runHotjar() a secas, enviar 100% del tráfico al hotjar script general
+			var d2id = readCookie('_d2id');
+			var regex = /[0-7]$/i;
+			var hotjarForWholeSiteRecordings = d2id.search(regex) > 1;
+		} else {
+			var hotjarForWholeSiteRecordings = true;
 		}
-	} else {
-		return myHotjarScriptId;
-	}
+
+		if (hotjarForWholeSiteRecordings) {
+			var country = document.documentElement.getAttribute('data-country') || document.body.getAttribute('data-country'); // country id works in ML but not in MP.
+			var mapa = {
+					 'ML': {
+					   'AR': 589860,
+					   'BR': 589861,
+					   'MX': 589863,
+					   'default': 601450
+					 },
+					 'MP': {
+					   'AR': 000000,
+					   'BR': 111111,
+					   'MX': 222222,
+					   'default': 999999
+					 }
+				};
+
+			var country = getCountry(window.location.href); // AR
+			var platform = getPlatform(window.location.href); // ML
+			var hotjarScriptId = mapa[platform][country];
+			return hotjarScriptId;
+
+		} else {
+			return myHotjarScriptId;
+		}
 }
 
 function readCookie(name) {
@@ -48,3 +68,22 @@ function readCookie(name) {
     }
     return null;
 }
+
+function getCountry(domain) {
+	switch (domain.match) {
+	    case /com\.ar|\.com\/ar|\.com\/mla/ : return 'AR' 
+	    case /com\.br|\.com\/br|\.com\/mlb/ : return 'BR'
+	    case /com\.mx|\.com\/mx|\.com\/mlm/ : return 'MX'
+		default : return 'default'
+	}
+}
+
+function getPlatform(domain) {
+	switch (domain.match) {
+	    case /mercadolibre/: return 'ML' 
+	    case /mercadopago/: return 'MP'
+		//no se me ocurre en qué caso devolvería un default : return 'default'
+	}
+}
+
+
