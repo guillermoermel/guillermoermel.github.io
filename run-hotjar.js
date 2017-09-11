@@ -69,20 +69,29 @@ function readCookie(name) {
     return null;
 }
 
-function getCountry(domain) {
-	switch (domain.match) {
+function getCountry(url) {
+	switch (url.match) {
 	    case /com\.ar|\.com\/ar|\.com\/mla/ : return 'AR' 
 	    case /com\.br|\.com\/br|\.com\/mlb/ : return 'BR'
 	    case /com\.mx|\.com\/mx|\.com\/mlm/ : return 'MX'
+	    case /com\.uy|\.com\/uy|\.com\/mlu/ : return 'UY'
+			
 		default : return 'default'
 	}
 }
 
-function getPlatform(domain) {
-	switch (domain.match) {
-	    case /mercadolibre/: return 'ML' 
-	    case /mercadopago/: return 'MP'
+function getPlatform(url) {
+	switch (url.match) {
+		case /mercadolibre/ :	return 'ML' 
+		case /mercadopago/ :	return 'MP'
+		case /metroscubicos/ :	return 'MC'
+		case /tucarro/ :	return 'TC'
+		// hace falta también tu lancha, tu avion, tu moto, tuinmueble?
+		//http://www.tuinmueble.com.ve/
+		//http://www.tulancha.com.ve/
+		//http://www.tuavion.com/
 		//no se me ocurre en qué caso devolvería un default : return 'default'
+		//metroscubicos tiene el problema de que es .com (pero tiene country_id)
 	}
 }
 
