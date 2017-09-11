@@ -71,12 +71,11 @@ function readCookie(name) {
 
 function getCountry(url) {
 	switch (url.match) {
-	    case /com\.ar|\.com\/ar|\.com\/mla/ : return 'AR' 
-	    case /com\.br|\.com\/br|\.com\/mlb/ : return 'BR'
-	    case /com\.mx|\.com\/mx|\.com\/mlm/ : return 'MX'
-	    case /com\.uy|\.com\/uy|\.com\/mlu/ : return 'UY'
-			
-		default : return 'default'
+	    case /\.com\/ar|\.com\/mla/ : return 'AR' 
+	    case /\.com\/br|\.com\/mlb/ : return 'BR'
+	    case /\.com\/mx|\.com\/mlm/ : return 'MX'
+	    case /\.com\/uy|\.com\/mlu/ : return 'UY'	
+	    default : return 'default'
 	}
 }
 
