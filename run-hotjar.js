@@ -1,7 +1,9 @@
+<script>
 runHotjar();
 
 function runHotjar(myHotjarScriptId) {
-	var hotjarScriptId = getHotjarScriptId(myHotjarScriptId);
+  //console.log('running: runHotjar function');
+  var hotjarScriptId = getHotjarScriptId(myHotjarScriptId);
 
 	if (hotjarScriptId) {
 		(function(h,o,t,j,a,r){
@@ -14,6 +16,10 @@ function runHotjar(myHotjarScriptId) {
 		})(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
 	}
 }
+//maybe some frequent tags here? like d2id segment
+hj('tagRecording', ['hj_segment: '+'d']);
+//also here should go routing to map this hotjar id to meli's user id and save it somewhere, e.g. melidata
+
 
 function getHotjarScriptId(myHotjarScriptId) {
 	/*this function returns the id of a pre-defined hotjar script by country for the lower 50% (d2id < 8) the website traffic, or an optional hotjar script id defined by the developer for the higher 50% (d2id > 8). If no id is defined for the higher 50%, only the lower 50% gets a hotjar script id.
@@ -32,7 +38,6 @@ function getHotjarScriptId(myHotjarScriptId) {
 		}
 
 		if (hotjarForWholeSiteRecordings) {
-			var country = document.documentElement.getAttribute('data-country') || document.body.getAttribute('data-country'); // country id works in ML but not in MP.
 			var mapa = {
 					 'ML': {
 					   'AR': 589860,
@@ -45,15 +50,18 @@ function getHotjarScriptId(myHotjarScriptId) {
 					   'BR': 111111,
 					   'MX': 222222,
 					   'default': 999999
+					 },
+					 'MC': {
+					 	'default': 620908
 					 }
 				};
-
-			var country = getCountry(window.location.href); // AR
-			var platform = getPlatform(window.location.href); // ML
-			var hotjarScriptId = mapa[platform][country];
-			return hotjarScriptId;
-
+//	var country = document.documentElement.getAttribute('data-country') || document.body.getAttribute('data-country'); // country id works in ML but not in MP.
+	var country = getCountry(window.location.href); // AR
+          var platform = getPlatform(window.location.href); // ML
+          var hotjarScriptId = mapa[platform][country];
+          return hotjarScriptId;
 		} else {
+          console.log(myHotjarScriptId);
 			return myHotjarScriptId;
 		}
 }
@@ -69,29 +77,26 @@ function readCookie(name) {
     return null;
 }
 
-function getCountry(url) {
-	switch (url.match) {
-	    case /\.com\/ar|\.com\/mla/ : return 'AR' 
-	    case /\.com\/br|\.com\/mlb/ : return 'BR'
-	    case /\.com\/mx|\.com\/mlm/ : return 'MX'
-	    case /\.com\/uy|\.com\/mlu/ : return 'UY'	
-	    default : return 'default'
-	}
-}
-
 function getPlatform(url) {
-	switch (url.match) {
-		case /mercadolibre/ :	return 'ML' 
-		case /mercadopago/ :	return 'MP'
-		case /metroscubicos/ :	return 'MC'
-		case /tucarro/ :	return 'TC'
-		// hace falta también tu lancha, tu avion, tu moto, tuinmueble?
+	if (url.match(/mercadolibre/)) return 'ML';
+	if (url.match(/mercadopago/)) return 'MP';  
+	if (url.match(/metroscubicos/)) return 'MC';  
+	if (url.match(/tucarro/)) return 'TC';  
+	return 'default' //si ninguno de los anteriores...
+  // hace falta también tu lancha, tu avion, tu moto, tuinmueble?
 		//http://www.tuinmueble.com.ve/
 		//http://www.tulancha.com.ve/
 		//http://www.tuavion.com/
 		//no se me ocurre en qué caso devolvería un default : return 'default'
 		//metroscubicos tiene el problema de que es .com (pero tiene country_id)
-	}
+}
+
+function getCountry(url) {
+	if (url.match(/.*\.com\.ar\/.*$|.*\.com\/mla\/.*$/i)) return 'AR';
+	if (url.match(/.*\.com\.br\/.*$|.*\.com\/mlb\/.*$/i)) return 'BR';  
+	if (url.match(/.*\.com\.mx\/.*$|.*\.com\/mlm\/.*$/i)) return 'MX';  
+	return 'default' //si ninguno de los anteriores...
 }
 
 
+</script>
